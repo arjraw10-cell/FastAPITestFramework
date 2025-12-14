@@ -1,0 +1,51 @@
+<html>
+<body>
+<h2>Chatbot</h2>
+<input id="input" />
+<button id="send">Send</button>
+
+
+<div style="display:flex; gap:40px; margin-top:20px">
+<div>
+<h3>AI</h3>
+<pre id="ai">Thinking...</pre>
+</div>
+<div>
+<h3>You</h3>
+<pre id="you"></pre>
+</div>
+</div>
+
+
+<script>
+const send = document.getElementById("send")
+const input = document.getElementById("input")
+const ai = document.getElementById("ai")
+const you = document.getElementById("you")
+
+
+send.onclick = async () => {
+you.textContent = input.value
+ai.textContent = "Thinking..."
+
+
+const res = await fetch("/api/chat", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ message: input.value })
+})
+
+
+ai.textContent = ""
+const reader = res.body.getReader()
+
+
+while (true) {
+const { value, done } = await reader.read()
+if (done) break
+ai.textContent += new TextDecoder().decode(value)
+}
+}
+</script>
+</body>
+</html>
